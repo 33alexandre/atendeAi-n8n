@@ -1,0 +1,509 @@
+{
+  "name": "atendeAi",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "webhook",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        144,
+        64
+      ],
+      "id": "55e01842-58fc-4c0c-ad25-3d5aa8b1cfa9",
+      "name": "Webhook",
+      "webhookId": "58347888-9401-4c0f-b284-32336f13d537"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ String($json.fromMe) }}",
+                    "rightValue": "false",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "9fa767f2-abaf-4d5a-8f14-b982a2575fb1"
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        736,
+        64
+      ],
+      "id": "88d905b8-2ba5-408b-996a-ca5c4b952e67",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message }}",
+        "options": {
+          "systemMessage": "=You are a natural WhatsApp assistant.\nReply briefly, clearly, and like a real person.\nKeep replies short, usually 1 or 2 sentences.\nDo not say you are an AI."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        912,
+        64
+      ],
+      "id": "3fa7d083-2faa-408a-9a5b-c330c381667a",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {
+          "temperature": 0.4
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        864,
+        240
+      ],
+      "id": "db310300-58c2-4097-bf23-b48c22d74c0f",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "NUwMotIXRqQRCMZt",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: $json\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        544,
+        64
+      ],
+      "id": "2883c5ea-5a46-4894-8953-4c47ce6ce780",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0ace3fd2-93c5-4e88-8c3c-e3809b1427c3",
+              "name": "session",
+              "value": "={{ $json.body.session }}",
+              "type": "string"
+            },
+            {
+              "id": "58c554ef-138b-4fa5-b37f-f184ed1bd334",
+              "name": "chatId",
+              "value": "={{ $json.body.payload.from }}",
+              "type": "string"
+            },
+            {
+              "id": "0a23974c-0022-4468-bc1c-bfa7e257e74e",
+              "name": "pushName",
+              "value": "={{ $json.body.payload._data.Info.PushName }}",
+              "type": "string"
+            },
+            {
+              "id": "a6b10faf-1c85-4c71-aafe-7760cc891376",
+              "name": "messageId",
+              "value": "={{ $json.body.payload.id }}",
+              "type": "string"
+            },
+            {
+              "id": "257d191e-2178-439d-a09a-7f0e5adf7cd5",
+              "name": "message",
+              "value": "={{ $json.body.payload.body }}",
+              "type": "string"
+            },
+            {
+              "id": "7491e7dd-110e-4897-811d-d0a7a8dbffe7",
+              "name": "fromMe",
+              "value": "={{ $json.body.payload.fromMe }}",
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        352,
+        64
+      ],
+      "id": "976fb0d6-e389-4a12-ac8b-e5c22a618563",
+      "name": "Prepare Input"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ff289511-f908-4814-8cd6-9f721fbef52a",
+              "name": "session",
+              "value": "={{ $('Prepare Input').item.json.session }}",
+              "type": "string"
+            },
+            {
+              "id": "c70b5473-5915-4990-8f05-75f3670e5ded",
+              "name": "chatId",
+              "value": "={{ $('Prepare Input').item.json.chatId }}",
+              "type": "string"
+            },
+            {
+              "id": "e9fb3525-e1fd-4a2c-b2f3-9d231c8d0711",
+              "name": "text",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1216,
+        64
+      ],
+      "id": "2596dd5a-303f-427c-a207-e644ca4b5dd6",
+      "name": "Prepare Reply"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:3000/api/sendText",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"session\": \"default\",\n  \"chatId\": \"{{ $json.chatId }}\",\n  \"text\": \"{{ $json.text }}\",\n  \"linkPreview\": false\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1392,
+        64
+      ],
+      "id": "10311b3c-d268-409a-8b3b-598d335b7ae6",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Prepare Input').item.json.chatId }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryRedisChat",
+      "typeVersion": 1.5,
+      "position": [
+        976,
+        320
+      ],
+      "id": "43542038-a08d-46a2-a33b-74cf0d4c327e",
+      "name": "Redis Chat Memory",
+      "credentials": {
+        "redis": {
+          "id": "7JhZKKSdjTajjvn3",
+          "name": "Redis account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "accept": "application/json, text/plain, */*",
+            "content-type": "application/json",
+            "user-agent": "WAHA/2026.3.4",
+            "x-webhook-request-id": "5pf7mnqbfrwn",
+            "x-webhook-timestamp": "1775668936198",
+            "content-length": "2748",
+            "accept-encoding": "gzip, compress, deflate, br",
+            "host": "host.docker.internal:5678",
+            "connection": "keep-alive"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "id": "evt_01knq1vfg6m10d83kyngp8xnct",
+            "timestamp": 1775668936198,
+            "event": "message",
+            "session": "default",
+            "metadata": {},
+            "me": {
+              "id": "554288817676@c.us",
+              "pushName": "alexandre.",
+              "lid": "73946485518591@lid",
+              "jid": "554288817676:78@s.whatsapp.net"
+            },
+            "payload": {
+              "id": "false_51058655125631@lid_3A72090093D8A8697D60",
+              "timestamp": 1775668936,
+              "from": "51058655125631@lid",
+              "fromMe": false,
+              "source": "app",
+              "body": "aqui so agr foi sair",
+              "to": null,
+              "participant": null,
+              "hasMedia": false,
+              "media": null,
+              "ack": 2,
+              "location": null,
+              "vCards": null,
+              "ackName": "DEVICE",
+              "replyTo": {
+                "id": "3A60C7CB135BC05C77D0",
+                "participant": "73946485518591@lid",
+                "body": "aq tá saindo sol",
+                "_data": {
+                  "conversation": "aq tá saindo sol"
+                }
+              },
+              "_data": {
+                "Info": {
+                  "Chat": "51058655125631@lid",
+                  "Sender": "51058655125631@lid",
+                  "IsFromMe": false,
+                  "IsGroup": false,
+                  "AddressingMode": "",
+                  "SenderAlt": "554299366680@s.whatsapp.net",
+                  "RecipientAlt": "",
+                  "BroadcastListOwner": "",
+                  "BroadcastRecipients": null,
+                  "ID": "3A72090093D8A8697D60",
+                  "ServerID": 0,
+                  "Type": "text",
+                  "PushName": "Maria",
+                  "Timestamp": "2026-04-08T17:22:16Z",
+                  "Category": "",
+                  "Multicast": false,
+                  "MediaType": "",
+                  "Edit": "",
+                  "MsgBotInfo": {
+                    "EditType": "",
+                    "EditTargetID": "",
+                    "EditSenderTimestampMS": "0001-01-01T00:00:00Z"
+                  },
+                  "MsgMetaInfo": {
+                    "TargetID": "",
+                    "TargetSender": "",
+                    "TargetChat": "",
+                    "DeprecatedLIDSession": null,
+                    "ThreadMessageID": "",
+                    "ThreadMessageSenderJID": ""
+                  },
+                  "VerifiedName": null,
+                  "DeviceSentMeta": null
+                },
+                "Message": {
+                  "extendedTextMessage": {
+                    "text": "aqui so agr foi sair",
+                    "contextInfo": {
+                      "stanzaID": "3A60C7CB135BC05C77D0",
+                      "participant": "73946485518591@lid",
+                      "quotedMessage": {
+                        "conversation": "aq tá saindo sol"
+                      },
+                      "quotedType": 0
+                    }
+                  },
+                  "messageContextInfo": {
+                    "deviceListMetadata": {
+                      "senderKeyHash": "GrASzgQznCENvA==",
+                      "senderTimestamp": 1775312907,
+                      "recipientKeyHash": "MRAL77iDgFjsrQ==",
+                      "recipientTimestamp": 1775657155
+                    },
+                    "deviceListMetadataVersion": 2,
+                    "messageSecret": "gNjbMiSLGWy3Jkzm7qcQmsNA5TqD8p0fc53uzGYI4tw="
+                  }
+                },
+                "IsEphemeral": false,
+                "IsViewOnce": false,
+                "IsViewOnceV2": false,
+                "IsViewOnceV2Extension": false,
+                "IsDocumentWithCaption": false,
+                "IsLottieSticker": false,
+                "IsBotInvoke": false,
+                "IsEdit": false,
+                "SourceWebMsg": null,
+                "UnavailableRequestID": "",
+                "RetryCount": 0,
+                "NewsletterMeta": null,
+                "RawMessage": {
+                  "extendedTextMessage": {
+                    "text": "aqui so agr foi sair",
+                    "contextInfo": {
+                      "stanzaID": "3A60C7CB135BC05C77D0",
+                      "participant": "73946485518591@lid",
+                      "quotedMessage": {
+                        "conversation": "aq tá saindo sol"
+                      },
+                      "quotedType": 0
+                    }
+                  },
+                  "messageContextInfo": {
+                    "deviceListMetadata": {
+                      "senderKeyHash": "GrASzgQznCENvA==",
+                      "senderTimestamp": 1775312907,
+                      "recipientKeyHash": "MRAL77iDgFjsrQ==",
+                      "recipientTimestamp": 1775657155
+                    },
+                    "deviceListMetadataVersion": 2,
+                    "messageSecret": "gNjbMiSLGWy3Jkzm7qcQmsNA5TqD8p0fc53uzGYI4tw="
+                  }
+                },
+                "Status": 3
+              }
+            },
+            "environment": {
+              "version": "2026.3.4",
+              "engine": "GOWS",
+              "tier": "CORE",
+              "browser": null,
+              "platform": "linux/x64",
+              "worker": {
+                "id": null
+              }
+            }
+          },
+          "webhookUrl": "http://host.docker.internal:5678/webhook-test/webhook",
+          "executionMode": "test"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Prepare Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Prepare Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Input": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Reply": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "dbde3a22-1137-4206-a484-9e87a6855205",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "10c3df42a7c07f1c186ce82f19895950ddce1ccfd0911d8c68f2673bbeeccfde"
+  },
+  "id": "PLRfd3ybP9ZkxFDE",
+  "tags": []
+}
